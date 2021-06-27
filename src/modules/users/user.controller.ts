@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Res } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
@@ -7,8 +7,8 @@ import { UsersService } from './users.service';
 export class UserController {
   constructor(private userService: UsersService) {}
   @Post('Create')
-  async getTags(@Body() data: UserDto): Promise<User> {
+  async getTags(@Res() res) {
     const emailUser = await this.userService.findOneByEmail('1sssd2');
-    return emailUser;
+    return res.json({ emailUser });
   }
 }
