@@ -7,7 +7,6 @@ import { UserDto } from '../users/dto/user.dto';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  // @UseGuards(AuthGuard('local'))
   @Post('login')
   async login(@Body() user: UserDto) {
     return await this.authService.login(user);
