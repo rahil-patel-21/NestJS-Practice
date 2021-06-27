@@ -27,8 +27,11 @@ export class AuthService {
   }
 
   public async login(user) {
-    const token = await this.generateToken(user);
-    return { user, token };
+    console.log(user);
+    const userData = await this.validateUser(user.email, user.password);
+    return userData;
+    // const token = await this.generateToken(user);
+    // return { user, token };
   }
 
   public async create(user) {
@@ -52,12 +55,12 @@ export class AuthService {
     return token;
   }
 
-  private async hashPassword(password) {
+  private async hashPassword(password: string) {
     const hash = await bcrypt.hash(password, 10);
     return hash;
   }
 
-  private async comparePassword(enteredPassword, dbPassword) {
+  private async comparePassword(enteredPassword: string, dbPassword: string) {
     const match = await bcrypt.compare(enteredPassword, dbPassword);
     return match;
   }
