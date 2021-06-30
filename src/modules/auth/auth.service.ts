@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
 import { JwtService } from '@nestjs/jwt';
+import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
@@ -39,7 +40,11 @@ export class AuthService {
     const pass = await this.hashPassword(user.password);
 
     // create the user
-    const newUser = await this.userService.create({ ...user, password: pass });
+    const newUser = await this.userService.create({
+      ...user,
+      password: pass,
+      id: uuidv4(),
+    });
 
     // tslint:disable-next-line: no-string-literal
     const { password, ...result } = newUser['dataValues'];

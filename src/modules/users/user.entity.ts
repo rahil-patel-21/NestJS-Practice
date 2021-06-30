@@ -3,6 +3,13 @@ import { Table, Column, Model, DataType } from 'sequelize-typescript';
 @Table
 export class User extends Model<User> {
   @Column({
+    defaultValue: DataType.UUIDV4,
+    primaryKey: true,
+    type: DataType.UUID,
+  })
+  id: string;
+
+  @Column({
     type: DataType.STRING,
     allowNull: true,
   })
