@@ -43,7 +43,8 @@
     "sequelize": "^6.6.2",
     "sequelize-typescript": "^2.1.0",
     "swagger-ui-express": "^4.1.6",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "youtube-dl-exec": "^1.2.4"
   },
   "devDependencies": {
     "@nestjs/cli": "^7.6.0",
@@ -88,6 +89,7 @@
   },
   "_moduleAliases": {
     "@app": "./dist",
-    "@tags": "./dist/tags"
+    "@tags": "./dist/tags",
+    "@models": "./dist/models"
   }
 }

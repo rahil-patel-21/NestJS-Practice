@@ -11,9 +11,11 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
+    "esModuleInterop": true,
     "paths": {
-      "@app/*" : ["./src/*"],
-      "@tags/*" : ["./src/tags/*"]
+      "@app/*": ["./src/*"],
+      "@tags/*": ["./src/tags/*"],
+      "@models/*": ["./src/models/*"]
     }
   }
 }
