@@ -15,6 +15,7 @@
     "paths": {
       "@app/*": ["./src/*"],
       "@tags/*": ["./src/tags/*"],
+      "@url/*": ["./src/modules/url/*"],
       "@models/*": ["./src/models/*"]
     }
   }
