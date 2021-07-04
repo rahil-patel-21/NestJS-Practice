@@ -11,11 +11,12 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async validateUser(username: string, pass: string) {
+  async validateUser(username: string, email: string, pass: string) {
     // find if user exist with this email
-    const user = await this.userService.findOneByEmail(username);
+    let user = await this.userService.findOneByEmail(username);
     if (!user) {
-      return null;
+      user = await this.userService.findOneByEmail(email);
+      if (!user) return null;
     }
 
     // find if user password match
@@ -23,37 +24,41 @@ export class AuthService {
     if (!match) {
       return null;
     }
-    const { password, ...result } = user['dataValues'];
+    const result = user['dataValues'];
     return result;
   }
 
   public async login(user) {
-    console.log(user);
-    const userData = await this.validateUser(user.email, user.password);
+    const userData = await this.validateUser(
+      user.username,
+      user.email,
+      user.password,
+    );
     return userData;
     // const token = await this.generateToken(user);
     // return { user, token };
   }
 
   public async create(user) {
-    // hash the password
     const pass = await this.hashPassword(user.password);
 
-    // create the user
     const newUser = await this.userService.create({
       ...user,
       password: pass,
       id: uuidv4(),
+      fcmToken: [user.fcmToken],
     });
 
-    // tslint:disable-next-line: no-string-literal
-    const { password, ...result } = newUser['dataValues'];
+    const result = newUser['dataValues'];
 
-    // generate token
     const token = await this.generateToken(result);
 
-    // return the user and the token
-    return { user: result, token };
+    return {
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+      token: token,
+    };
   }
   private async generateToken(user) {
     const token = await this.jwtService.signAsync(user);

@@ -1,6 +1,6 @@
 export class URLModel {
   title?: string;
-  thumbnail: string;
+  thumbnail?: string;
   audioURLs: string[];
   videoURLs: string[];
 
