@@ -1,4 +1,4 @@
-import { User } from '@app/modules/users/user.entity';
+import { User } from '@app/modules/user/user.entity';
 import { Sequelize } from 'sequelize-typescript';
 import { databaseConfig } from './database.config';
 

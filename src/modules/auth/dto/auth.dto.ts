@@ -2,12 +2,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, MinLength, IsEmail } from 'class-validator';
 
 export class AuthDto {
-  @IsNotEmpty()
   @MinLength(5)
   @ApiProperty({ type: String, description: 'Username' })
   readonly username: string;
 
-  @IsNotEmpty()
   @IsEmail()
   @ApiProperty({ type: String, description: 'Email' })
   readonly email: string;

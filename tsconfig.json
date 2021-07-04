@@ -14,8 +14,11 @@
     "esModuleInterop": true,
     "paths": {
       "@app/*": ["./src/*"],
+      "@core/*": ["./src/core/*"],
       "@tags/*": ["./src/tags/*"],
+      "@auth/*": ["./src/modules/auth/*"],
       "@url/*": ["./src/modules/url/*"],
+      "@user/*": ["./src/modules/user/*"],
       "@models/*": ["./src/models/*"]
     }
   }
