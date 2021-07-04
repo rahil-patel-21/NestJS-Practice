@@ -31,6 +31,7 @@
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
     "dotenv": "^8.2.0",
+    "firebase-admin": "^9.10.0",
     "module-alias": "^2.2.2",
     "mysql2": "^2.2.5",
     "passport": "^0.4.1",

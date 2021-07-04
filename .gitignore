@@ -34,3 +34,4 @@ lerna-debug.log*
 !.vscode/extensions.json
 
 .env
+nestjs-practice-firebase-adminsdk-m59s7-ce021fec5d.json
