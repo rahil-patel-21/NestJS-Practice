@@ -12,7 +12,6 @@ export class AuthService {
   ) {}
 
   async validateUser(username: string, email: string, pass: string) {
-    console.log(username, email);
     // find if user exist with this email
     let user = await this.userService.findOneByUsername(username);
     if (!user) {
@@ -35,13 +34,19 @@ export class AuthService {
       user.password,
     );
     if (userData) {
-      const token = await this.generateToken(user);
-      return {
-        id: userData.id,
-        name: userData.name,
-        email: userData.email,
-        token: token,
-      };
+      userData.deviceID = user.deviceID;
+      userData.deviceType = user.deviceType;
+      userData.fcmToken.push(user.fcmToken);
+      const data = await this.userService.update(userData, userData.id);
+      if (data) {
+        const token = await this.generateToken(user);
+        return {
+          id: userData.id,
+          name: userData.name,
+          email: userData.email,
+          token: token,
+        };
+      } else return null;
     } else return null;
   }
 
