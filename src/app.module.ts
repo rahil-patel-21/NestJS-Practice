@@ -7,6 +7,7 @@ import { AuthModule } from '@auth/auth.module';
 import { UsersModule } from '@user/users.module';
 import { AppController } from '@app/app.controller';
 import { DatabaseModule } from '@core/database/database.module';
+import { NotificationModule } from '@notification/notification.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { DatabaseModule } from '@core/database/database.module';
     UsersModule,
     AuthModule,
     URLModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

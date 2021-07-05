@@ -3,11 +3,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { JwtService } from '@nestjs/jwt';
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '@user/users.service';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UsersService,
+    private readonly notificationService: NotificationService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -36,10 +38,19 @@ export class AuthService {
     if (userData) {
       userData.deviceID = user.deviceID;
       userData.deviceType = user.deviceType;
-      userData.fcmToken.push(user.fcmToken);
+      if (!userData.fcmToken.includes(user.fcmToken))
+        userData.fcmToken.push(user.fcmToken);
       const data = await this.userService.update(userData, userData.id);
       if (data) {
         const token = await this.generateToken(user);
+        userData.fcmToken.forEach((element) => {
+          if (element != user.fcmToken)
+            this.notificationService.sendNotificationToDevice(
+              element,
+              'New device login',
+              'new login detected',
+            );
+        });
         return {
           id: userData.id,
           name: userData.name,

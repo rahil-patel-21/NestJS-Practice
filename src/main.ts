@@ -1,19 +1,15 @@
-if (!process.env.IS_TS_NODE) {
-  require('module-alias/register');
-}
+if (!process.env.IS_TS_NODE) require('module-alias/register');
 
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { AppModule } from '@app/app.module';
 import * as admin from 'firebase-admin';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { ValidatePipe } from './core/pipes/validator.pipe';
+import { ValidatePipe } from '@core/pipes/validator.pipe';
 
-async function bootstrap() {
+async function backendService() {
   const app = await NestFactory.create(AppModule);
   admin.initializeApp({
-    credential: admin.credential.cert(
-      'nestjs-practice-firebase-adminsdk-m59s7-ce021fec5d.json',
-    ),
+    credential: admin.credential.cert(process.env.FIREBASE_KEY_PATH),
   });
   app.setGlobalPrefix('/v1');
   const config = new DocumentBuilder().build();
@@ -22,4 +18,4 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidatePipe());
   await app.listen(process.env.PORT || 3000);
 }
-bootstrap();
+backendService();
