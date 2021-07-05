@@ -5,6 +5,7 @@ import { AppService } from '@app/app.service';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from '@auth/auth.module';
 import { UsersModule } from '@user/users.module';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from '@app/app.controller';
 import { DatabaseModule } from '@core/database/database.module';
 import { NotificationModule } from '@notification/notification.module';
@@ -12,6 +13,7 @@ import { NotificationModule } from '@notification/notification.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    ScheduleModule.forRoot(),
     TagModule,
     DatabaseModule,
     UsersModule,
