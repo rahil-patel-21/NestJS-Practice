@@ -7,7 +7,8 @@ export class StatementController {
 
   @Get('extractData')
   async runTest() {
-    this.statementService.extractPDFData();
-    return true;
+    const result = await this.statementService.extractPDFData();
+    console.log('result', result);
+    return result;
   }
 }
