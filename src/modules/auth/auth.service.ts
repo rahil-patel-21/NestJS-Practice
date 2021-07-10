@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { JwtService } from '@nestjs/jwt';
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '@user/users.service';
-import { NotificationService } from '../notification/notification.service';
+import { NotificationService } from '@notification/notification.service';
 
 @Injectable()
 export class AuthService {

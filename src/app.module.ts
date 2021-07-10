@@ -7,6 +7,7 @@ import { AuthModule } from '@auth/auth.module';
 import { UsersModule } from '@user/users.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from '@app/app.controller';
+import { StatementModule } from '@statement/statement.module';
 import { DatabaseModule } from '@core/database/database.module';
 import { NotificationModule } from '@notification/notification.module';
 
@@ -20,6 +21,7 @@ import { NotificationModule } from '@notification/notification.module';
     AuthModule,
     URLModule,
     NotificationModule,
+    StatementModule,
   ],
   controllers: [AppController],
   providers: [AppService],

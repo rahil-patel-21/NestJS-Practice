@@ -18,6 +18,7 @@
       "@tags/*": ["./src/tags/*"],
       "@auth/*": ["./src/modules/auth/*"],
       "@url/*": ["./src/modules/url/*"],
+      "@statement/*": ["./src/modules/statement/*"],
       "@user/*": ["./src/modules/user/*"],
       "@notification/*": ["./src/modules/notification/*"],
       "@models/*": ["./src/models/*"]

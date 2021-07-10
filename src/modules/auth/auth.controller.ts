@@ -1,13 +1,13 @@
-import { Controller, Body, Post } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
-import { AuthService } from './auth.service';
-import { AuthDto } from './dto/auth.dto';
+import { AuthDto } from '@auth/dto/auth.dto';
+import { AuthService } from '@auth/auth.service';
+import { Controller, Body, Post } from '@nestjs/common';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Cron('1 0 * * * *')
+  @Cron('1 0 1 * * *')
   startCron() {
     console.log('Cron triggered !');
   }
