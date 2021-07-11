@@ -1,41 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { ScrapModel } from '@app/models/scrap.model';
 import moment from 'moment';
-import PDFParser from 'pdf2json';
 import { Transaction } from '@app/models/transaction.model';
 
 @Injectable()
 export class StatementService {
-  public async extractPDFData() {
-    try {
-      const pdfParser = new PDFParser();
-      const result = await pdfParser.loadPDF(
-        'src/modules/statement/sample3.pdf',
-      );
-      pdfParser.on('pdfParser_dataError', (errData) =>
-        console.error(errData.parserError),
-      );
-      pdfParser.on('pdfParser_dataReady', (pdfData) => {
-        const totalPages: number = pdfData['formImage']['Pages'].length;
-        let transactions: Transaction[] = [];
-        // for (let index = 0; index < totalPages; index++) {
-        const statements = this.getIDFCMobileLatestStatement(0, pdfData);
-        if (statements != null) {
-          if (statements.length != 0) {
-            if (transactions.length == 0) transactions = statements;
-            else transactions = [...transactions, ...statements];
-          }
-        }
-        // }
-        console.log(transactions);
-        return transactions;
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  private getIDFCMobileLatestStatement(page: number, pdfData: any) {
+  public getIDFCMobileLatestStatement(page: number, pdfData: any) {
     try {
       const textData: [any] = pdfData['formImage']['Pages'][page]['Texts'];
       const transactions: Transaction[] = [];
@@ -94,6 +64,18 @@ export class StatementService {
           minY != 0 &&
           !scrapModel.content.includes('REGISTERED OFFICE:') &&
           !scrapModel.content.includes(
+            'Unless the constituent notifies the bank immediately of any discrepancy found by him',
+          ) &&
+          !scrapModel.content.includes(
+            'Please call us at 1800 419 4332 in case of queries.',
+          ) &&
+          !scrapModel.content.includes('banker@idfcfirstbank.com') &&
+          !scrapModel.content.includes(
+            '------- End of the statement -------',
+          ) &&
+          !scrapModel.content.includes('IMPORTANT MESSAGE') &&
+          !scrapModel.content.includes('for details.') &&
+          !scrapModel.content.includes(
             'Page ' +
               (page + 1).toString() +
               ' of ' +
@@ -132,14 +114,13 @@ export class StatementService {
             transaction.description = transaction.description + element.content;
         }
       });
-      console.log(transactions);
       return transactions;
     } catch (error) {
       console.log(error);
     }
   }
 
-  private getIDFCDesktopLatestStatement(page: number, pdfData: any) {
+  public getIDFCDesktopLatestStatement(page: number, pdfData: any) {
     try {
       const textData: [any] = pdfData['formImage']['Pages'][page]['Texts'];
       const transactions: Transaction[] = [];
@@ -230,6 +211,90 @@ export class StatementService {
         }
       });
       return transactions;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  public getQuickSummary(transactions: Transaction[]) {
+    try {
+      const creditTransactions: Transaction[] = [];
+      const debitTransactions: Transaction[] = [];
+      let investmentIncome = 0;
+      let totalCredits = 0;
+      let totalDebits = 0;
+      let cashWithdrawls = 0;
+      let foodExpenses = 0;
+      let petrolExpenses = 0;
+      let investmentExpenses = 0;
+      let shoppingExpenses = 0;
+      const salaries: Transaction[] = [];
+      transactions.forEach((element) => {
+        if (element.mode == 'CREDIT') {
+          creditTransactions.push(element);
+          totalCredits = totalCredits + element.amount;
+          if (
+            element.description.toLowerCase().includes(' sip ') ||
+            element.description.toLowerCase().includes('zerodha') ||
+            element.description.toLowerCase().includes('nach')
+          )
+            investmentIncome = investmentIncome + element.amount;
+          else if (element.description.toLowerCase().includes('salary'))
+            salaries.push(element);
+          else if (element.type != null) {
+            if (
+              element.type.toLowerCase().includes('single transfer') &&
+              element.category
+                .toLowerCase()
+                .includes('income • income (other)?')
+            )
+              salaries.push(element);
+          }
+        } else if (element.mode == 'DEBIT') {
+          debitTransactions.push(element);
+          totalDebits = totalDebits + element.amount;
+          if (element.description.includes('CASH WITHDRAWAL'))
+            cashWithdrawls = cashWithdrawls + element.amount;
+          else if (
+            element.description.toLowerCase().includes('pizza') ||
+            element.description.toLowerCase().includes('zomato') ||
+            element.description.toLowerCase().includes('restaurant') ||
+            element.description.toLowerCase().includes('food')
+          )
+            foodExpenses = foodExpenses + element.amount;
+          else if (
+            element.description.toLowerCase().includes('shopping') ||
+            element.description.toLowerCase().includes('dmart') ||
+            element.description.toLowerCase().includes('amazon') ||
+            element.description.toLowerCase().includes('chroma') ||
+            element.description.toLowerCase().includes('flipkart')
+          )
+            shoppingExpenses = shoppingExpenses + element.amount;
+          else if (element.description.toLowerCase().includes('petrol'))
+            petrolExpenses = petrolExpenses + element.amount;
+          else if (
+            element.description.toLowerCase().includes(' sip ') ||
+            element.description.toLowerCase().includes('zerodha') ||
+            element.description.toLowerCase().includes('nach')
+          )
+            investmentExpenses = investmentExpenses + element.amount;
+          else if (element.category != null) {
+            if (element.category.toLowerCase().includes('cash withdrawals'))
+              cashWithdrawls = cashWithdrawls + element.amount;
+          }
+        }
+      });
+      return {
+        'Total credit amount': totalCredits,
+        'Total debit amount': totalDebits,
+        'Total Salaries': salaries,
+        'Total investment income': investmentIncome,
+        'Total investment expenses': investmentExpenses,
+        'Total cash withdrawals': cashWithdrawls,
+        'Total food expenses': foodExpenses,
+        'Total petrol expenses': petrolExpenses,
+        'Total shopping expenses': shoppingExpenses,
+      };
     } catch (error) {
       console.log(error);
     }
