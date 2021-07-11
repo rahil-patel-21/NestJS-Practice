@@ -101,6 +101,8 @@ export class StatementService {
               .replace('₹', '')
               .replace('+', '')
               .replace('-', '')
+              .replace(',', '')
+              .replace(',', '')
               .replace(',', ''),
           );
           if (element.xDirection < 25) transaction.mode = 'DEBIT';
@@ -204,7 +206,12 @@ export class StatementService {
         ) {
           transaction.mode = element.content.includes('+') ? 'CREDIT' : 'DEBIT';
           transaction.amount = parseFloat(
-            element.content.replace('₹', '').replace('+', '').replace(',', ''),
+            element.content
+              .replace('₹', '')
+              .replace('+', '')
+              .replace(',', '')
+              .replace(',', '')
+              .replace(',', ''),
           );
           if (element == scrapData[scrapData.length - 1])
             transactions.push(transaction);
