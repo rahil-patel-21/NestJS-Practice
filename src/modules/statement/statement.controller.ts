@@ -1,20 +1,42 @@
-import { Controller, Get, Res } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Res,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import PDFParser from 'pdf2json';
 import { StatementService } from '@statement/statement.service';
 import { Transaction } from '@app/models/transaction.model';
 import { IDFCPattern } from '@app/enums/idfc.pattern';
+import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { StatementDTO } from './dto/statement.dto';
+import { FileInterceptor } from '@nestjs/platform-express/multer';
+import { extname } from 'path';
+import { diskStorage } from 'multer';
+import fs from 'fs';
 
 @Controller('statement')
 export class StatementController {
   constructor(private readonly statementService: StatementService) {}
 
-  @Get('extractData')
-  async runTest(@Res() res) {
+  @ApiConsumes('multipart/form-data')
+  @Post('extractData')
+  @ApiBody({ type: StatementDTO })
+  @UseInterceptors(
+    FileInterceptor('pdfFile', {
+      storage: diskStorage({
+        destination: './',
+        filename: (req, file, cb) => {
+          cb(null, `${Date.now()}${extname(file.originalname)}`);
+        },
+      }),
+    }),
+  )
+  async runTest(@UploadedFile() file, @Res() res) {
     try {
       const pdfParser = new PDFParser();
-      const result = await pdfParser.loadPDF(
-        'src/modules/statement/sample.pdf',
-      );
+      const result = await pdfParser.loadPDF(file['path']);
       if (result) console.log('PDF parsed ...');
       pdfParser.on('pdfParser_dataError', (errData) =>
         console.error(errData.parserError),
@@ -47,6 +69,7 @@ export class StatementController {
         let quickSummary;
         if (transactions.length != 0)
           quickSummary = this.statementService.getQuickSummary(transactions);
+        fs.unlinkSync(file['path']);
         return res.json({ quickSummary: quickSummary, summary: transactions });
       });
     } catch (error) {
