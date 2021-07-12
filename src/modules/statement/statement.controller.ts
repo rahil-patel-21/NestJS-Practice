@@ -2,6 +2,7 @@ import { Controller, Get, Res } from '@nestjs/common';
 import PDFParser from 'pdf2json';
 import { StatementService } from '@statement/statement.service';
 import { Transaction } from '@app/models/transaction.model';
+import { IDFCPattern } from '@app/enums/idfc.pattern';
 
 @Controller('statement')
 export class StatementController {
@@ -21,9 +22,21 @@ export class StatementController {
       await pdfParser.on('pdfParser_dataReady', (pdfData) => {
         const totalPages: number = pdfData['formImage']['Pages'].length;
         let transactions: Transaction[] = [];
+        //check PDF structure
+        const pdfStructure = this.statementService.checkIDFCPattern(
+          pdfData['formImage']['Pages'][0]['Texts'],
+        );
         for (let index = 0; index < totalPages; index++) {
           const statements =
-            this.statementService.getIDFCDesktopLatestStatement(index, pdfData);
+            pdfStructure === IDFCPattern.latestMobile
+              ? this.statementService.getIDFCMobileLatestStatement(
+                  index,
+                  pdfData,
+                )
+              : this.statementService.getIDFCDesktopLatestStatement(
+                  index,
+                  pdfData,
+                );
           if (statements != null) {
             if (statements.length != 0) {
               if (transactions.length == 0) transactions = statements;

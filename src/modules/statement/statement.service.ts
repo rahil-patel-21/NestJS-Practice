@@ -1,10 +1,24 @@
 import { Injectable } from '@nestjs/common';
-import { ScrapModel } from '@app/models/scrap.model';
+import { ScrapModel } from '@models/scrap.model';
 import moment from 'moment';
-import { Transaction } from '@app/models/transaction.model';
+import { Transaction } from '@models/transaction.model';
+import { IDFCPattern } from './../../enums/idfc.pattern';
 
 @Injectable()
 export class StatementService {
+  public checkIDFCPattern(pdfFirstPage: any): IDFCPattern {
+    try {
+      const firstRawData = pdfFirstPage[0]['R'][0]['T'].toString();
+      const firstData = decodeURIComponent(firstRawData);
+      if (firstData === 'Smart Summary') return IDFCPattern.latestDesktop;
+      else if (firstData === 'DATE OF OPENING') return IDFCPattern.latestMobile;
+      else return IDFCPattern.notFound;
+    } catch (error) {
+      console.log(error);
+      return IDFCPattern.notFound;
+    }
+  }
+
   public getIDFCMobileLatestStatement(page: number, pdfData: any) {
     try {
       const textData: [any] = pdfData['formImage']['Pages'][page]['Texts'];
